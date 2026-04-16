@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday!</title>
+    <title>Happy Birthday Ece! 🎂</title>
+    <meta name="description" content="Birthday video messages for Ece from her loving family.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
@@ -14,114 +15,180 @@
 <body>
     <header>
         <h1>İyi ki doğdun aşkım!</h1>
-        <p>Seni ailece çok seviyoruz.</p>
+        <p>Seni ailece çok seviyoruz. 🤍</p>
     </header>
 
-    <main>
-        <section id="video-gallery">
-            <!-- Videos will be dynamically inserted here or added later -->
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Ceren</p>
-                </div>
-                <div class="message-container">
-                    <h2>Ceren</h2>
+    <div id="family-tree">
+
+        <!-- SVG Layer — rendered behind cards via z-index 0 -->
+        <svg id="tree-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="glow-filter" x="-80%" y="-80%" width="260%" height="260%">
+                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                    <feMerge>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+                <!-- Gradient in SVG user-space; y1/y2 updated by JS on scroll -->
+                <linearGradient id="scroll-gradient" x1="0" x2="0" y1="0" y2="400" gradientUnits="userSpaceOnUse">
+                    <stop id="gs0" offset="0"    stop-color="white" stop-opacity="0"/>
+                    <stop id="gs1" offset="0.15" stop-color="white" stop-opacity="1"/>
+                    <stop id="gs2" offset="0.85" stop-color="white" stop-opacity="1"/>
+                    <stop id="gs3" offset="1"    stop-color="white" stop-opacity="0"/>
+                </linearGradient>
+                <mask id="scroll-mask">
+                    <!-- Huge rect; mask opacity driven by the gradient above -->
+                    <rect x="-9999" y="-9999" width="99999" height="999999" fill="url(#scroll-gradient)"/>
+                </mask>
+            </defs>
+            <!-- Dim layer always visible; glow layer revealed by scroll mask -->
+            <g id="dim-layer"></g>
+            <g id="glow-layer" mask="url(#scroll-mask)" filter="url(#glow-filter)"></g>
+        </svg>
+
+        <!-- ══════════════════════════════════════════════════
+             ROW 1 — Grandparents
+        ═══════════════════════════════════════════════════ -->
+        <div class="tree-row" id="row-gp">
+
+            <div class="gp-cluster" id="cluster-maternal">
+                <p class="cluster-label">Anne'nin annesi ve babası</p>
+                <div class="cluster-inner">
+                    <div class="video-card" data-id="anneanne">
+                        <div class="video-container"></div>
+                        <div class="message-container">
+                            <h2>Anneanne</h2>
+                            <span class="relation-tag">Büyükanne</span>
+                        </div>
+                    </div>
+                    <div class="video-card" data-id="dede1">
+                        <div class="video-container"></div>
+                        <div class="message-container">
+                            <h2>Dede</h2>
+                            <span class="relation-tag">Büyükbaba</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Memo</p>
-                </div>
-                <div class="message-container">
-                    <h2>Memo</h2>
-                </div>
-            </div>
-
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Kaan</p>
-                </div>
-                <div class="message-container">
-                    <h2>Kaan</h2>
-                </div>
-            </div>
-
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Anne</p>
-                </div>
-                <div class="message-container">
-                    <h2>Anne</h2>
+            <div class="gp-cluster" id="cluster-paternal">
+                <p class="cluster-label">Baba'nın annesi ve babası</p>
+                <div class="cluster-inner">
+                    <div class="video-card" data-id="babanne">
+                        <div class="video-container"></div>
+                        <div class="message-container">
+                            <h2>Babanne</h2>
+                            <span class="relation-tag">Büyükanne</span>
+                        </div>
+                    </div>
+                    <div class="video-card" data-id="dede2">
+                        <div class="video-container"></div>
+                        <div class="message-container">
+                            <h2>Dede</h2>
+                            <span class="relation-tag">Büyükbaba</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Baba</p>
+        </div><!-- /row-gp -->
+
+        <!-- ══════════════════════════════════════════════════
+             ROW 2 — Parents + Aunt
+        ═══════════════════════════════════════════════════ -->
+        <div class="tree-row" id="row-parents">
+
+            <div class="parent-left">
+                <div class="video-card" data-id="sule">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Sule</h2>
+                        <span class="relation-tag">Teyze</span>
+                    </div>
                 </div>
-                <div class="message-container">
-                    <h2>Baba</h2>
+                <div class="video-card" data-id="anne">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Anne</h2>
+                        <span class="relation-tag">Annen</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Sule</p>
-                </div>
-                <div class="message-container">
-                    <h2>Sule</h2>
-                </div>
-            </div>
-
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Öykü</p>
-                </div>
-                <div class="message-container">
-                    <h2>Öykü</h2>
+            <div class="parent-right">
+                <div class="video-card" data-id="baba">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Baba</h2>
+                        <span class="relation-tag">Baban</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Anneanne</p>
-                </div>
-                <div class="message-container">
-                    <h2>Anneanne</h2>
+        </div><!-- /row-parents -->
+
+        <!-- ══════════════════════════════════════════════════
+             ROW 3 — Siblings + Cousin
+        ═══════════════════════════════════════════════════ -->
+        <div class="tree-row" id="row-siblings">
+
+            <div class="cousin-group">
+                <div class="video-card" data-id="oyku">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Öykü</h2>
+                        <span class="relation-tag">Kuzen</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Dede 1</p>
+            <div class="sibling-group">
+                <div class="video-card" data-id="ceren">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Ceren</h2>
+                        <span class="relation-tag">Abla</span>
+                    </div>
                 </div>
-                <div class="message-container">
-                    <h2>Dede 1</h2>
+                <div class="video-card" data-id="memo">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Memo</h2>
+                        <span class="relation-tag">Ağabey</span>
+                    </div>
+                </div>
+                <div class="video-card" data-id="kaan">
+                    <div class="video-container"></div>
+                    <div class="message-container">
+                        <h2>Kaan</h2>
+                        <span class="relation-tag">Kardeş</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Babanne</p>
-                </div>
-                <div class="message-container">
-                    <h2>Babanne</h2>
+        </div><!-- /row-siblings -->
+
+        <!-- ══════════════════════════════════════════════════
+             ROW 4 — Birthday Girl
+        ═══════════════════════════════════════════════════ -->
+        <div class="tree-row" id="row-ece">
+            <div class="ece-card">
+                <div class="ece-ring ece-ring-3"></div>
+                <div class="ece-ring ece-ring-2"></div>
+                <div class="ece-ring ece-ring-1"></div>
+                <div class="ece-inner">
+                    <div class="ece-crown">👑</div>
+                    <h2 class="ece-name">Ece</h2>
+                    <p class="ece-subtitle">İyi ki doğdun!</p>
+                    <div class="ece-hearts">♥ ♥ ♥</div>
                 </div>
             </div>
+        </div>
 
-            <div class="video-card">
-                <div class="video-container">
-                    <p>Video Placeholder - Dede 2</p>
-                </div>
-                <div class="message-container">
-                    <h2>Dede 2</h2>
-                </div>
-            </div>
-        </section>
-    </main>
+    </div><!-- /family-tree -->
 
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
-
 </html>

@@ -1,182 +1,318 @@
+/* ════════════════════════════════════════════
+   Design Tokens
+═══════════════════════════════════════════ */
 :root {
-    --bg-cream: #FAF8F5;
-    --surface-beige: #E9DFD3; /* Darkened */
-    --text-espresso: #3A2E28;
-    --text-taupe: #5A4D44; /* Darkened */
-    --accent-caramel: #B58451; /* Darkened */
-    --shadow-tint: rgba(58, 46, 40, 0.12);
+    --bg-cream:          #FAF8F5;
+    --surface-beige:     #E9DFD3;
+    --text-espresso:     #3A2E28;
+    --text-taupe:        #5A4D44;
+    --accent-caramel:    #B58451;
+    --accent-gold:       #D4A373;
+    --shadow-tint:       rgba(58, 46, 40, 0.12);
     --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    --line-dim:          rgba(181, 132, 81, 0.18);
+    --line-glow:         #D4A373;
+    --card-w:            185px;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+/* ════════════════════════════════════════════
+   Reset & Base
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: 'Outfit', sans-serif;
     line-height: 1.6;
     background-color: var(--bg-cream);
     color: var(--text-espresso);
-    padding: 40px 20px;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
+/* ════════════════════════════════════════════
+   Header
+═══════════════════════════════════════════ */
 header {
     text-align: center;
-    margin-bottom: 60px;
+    padding: 60px 20px 50px;
     animation: fadeInDown 1s ease-out;
 }
-
 header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(2.5rem, 8vw, 4rem);
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
     font-weight: 800;
-    margin-bottom: 10px;
     color: var(--text-espresso);
+    margin-bottom: 10px;
 }
-
 header p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--text-taupe);
     font-weight: 300;
 }
 
-#video-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 40px;
+/* ════════════════════════════════════════════
+   Family Tree Container
+═══════════════════════════════════════════ */
+#family-tree {
+    position: relative;
     max-width: 1300px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 40px 120px;
+    display: flex;
+    flex-direction: column;
+    gap: 80px; /* vertical spacing between rows — also the space for SVG connectors */
 }
 
+/* ════════════════════════════════════════════
+   SVG Overlay (behind cards)
+═══════════════════════════════════════════ */
+#tree-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 0;
+}
+
+.dim-path {
+    stroke: var(--line-dim);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.glow-path {
+    stroke: var(--line-glow);
+    stroke-width: 2.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ════════════════════════════════════════════
+   Tree Rows
+═══════════════════════════════════════════ */
+.tree-row {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1; /* cards sit above SVG */
+}
+
+/* Row 1 — Grandparents */
+#row-gp {
+    justify-content: space-between;
+}
+.gp-cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.cluster-inner {
+    display: flex;
+    gap: 20px;
+}
+.cluster-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.78rem;
+    color: var(--text-taupe);
+    font-style: italic;
+    opacity: 0.65;
+    text-align: center;
+    letter-spacing: 0.02em;
+}
+
+/* Row 2 — Parents + Aunt */
+#row-parents {
+    justify-content: space-between;
+}
+.parent-left {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.parent-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Row 3 — Siblings + Cousin */
+#row-siblings {
+    justify-content: space-between;
+    align-items: center;
+}
+.cousin-group { flex: 0 0 auto; }
+.sibling-group {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Row 4 — Birthday Girl */
+#row-ece {
+    justify-content: center;
+    padding: 20px 0;
+}
+
+/* ════════════════════════════════════════════
+   Video Cards
+═══════════════════════════════════════════ */
 .video-card {
     background: var(--surface-beige);
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 10px 30px var(--shadow-tint);
+    box-shadow: 0 8px 24px var(--shadow-tint);
     transition: var(--transition-smooth);
-    border: 1px solid rgba(212, 163, 115, 0.1);
-    animation: fadeInUp 0.8s ease-out both;
+    border: 1px solid rgba(212, 163, 115, 0.12);
     position: relative;
     z-index: 2;
+    width: var(--card-w);
+    flex-shrink: 0;
 }
-
 .video-card:hover {
-    transform: translateY(-12px) scale(1.1); /* Increased lift and added scale */
-    box-shadow: 0 25px 50px rgba(58, 46, 40, 0.18);
+    transform: translateY(-10px) scale(1.1);
+    box-shadow: 0 24px 48px rgba(58, 46, 40, 0.2);
     border-color: var(--accent-caramel);
     z-index: 10;
 }
 
 .video-container {
-    background-color: #E6DED5;
-    height: 220px;
+    background: linear-gradient(135deg, #E6DED5, #D9CFC4);
+    height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-taupe);
-    font-style: italic;
     position: relative;
     overflow: hidden;
 }
-
 .video-container::after {
-    content: "Play Button Placeholder"; /* To be replaced by actual video later */
-    font-size: 0.9rem;
-    opacity: 0.6;
+    content: "▶";
+    font-size: 2rem;
+    opacity: 0.25;
+    color: var(--text-espresso);
 }
 
 .message-container {
-    padding: 30px;
+    padding: 14px 16px;
+    text-align: center;
 }
-
 .message-container h2 {
     font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
+    font-size: 1.1rem;
     color: var(--text-espresso);
-    border-bottom: 2px solid var(--accent-caramel);
     display: block;
     width: fit-content;
-    margin: 0 auto;
-    padding-bottom: 5px;
+    margin: 0 auto 4px;
+    border-bottom: 1.5px solid var(--accent-caramel);
+    padding-bottom: 3px;
+}
+.relation-tag {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--accent-caramel);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
 }
 
-
-
-/* Animations */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ════════════════════════════════════════════
+   Ece — Birthday Girl Card
+═══════════════════════════════════════════ */
+.ece-card {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.ece-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent-caramel);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+}
+.ece-ring-1 { width: 100%;  height: 100%;  opacity: 0.8; animation: ringPulse 2.8s ease-in-out infinite 0s;   }
+.ece-ring-2 { width: 122%;  height: 122%;  opacity: 0.4; animation: ringPulse 2.8s ease-in-out infinite 0.6s; }
+.ece-ring-3 { width: 145%;  height: 145%;  opacity: 0.18; animation: ringPulse 2.8s ease-in-out infinite 1.2s; }
+
+@keyframes ringPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1);    opacity: inherit; }
+    50%       { transform: translate(-50%, -50%) scale(1.04); opacity: 0;        }
 }
 
-/* Staggered animation for cards */
-.video-card:nth-child(1) { animation-delay: 0.1s; }
-.video-card:nth-child(2) { animation-delay: 0.2s; }
-.video-card:nth-child(3) { animation-delay: 0.3s; }
-.video-card:nth-child(4) { animation-delay: 0.4s; }
-.video-card:nth-child(5) { animation-delay: 0.5s; }
-.video-card:nth-child(6) { animation-delay: 0.6s; }
-.video-card:nth-child(7) { animation-delay: 0.7s; }
-.video-card:nth-child(8) { animation-delay: 0.8s; }
-.video-card:nth-child(9) { animation-delay: 0.9s; }
-.video-card:nth-child(10) { animation-delay: 1.0s; }
-.video-card:nth-child(11) { animation-delay: 1.1s; }
-
-/* Responsive Adjustments */
-@media (max-width: 600px) {
-    body {
-        padding: 20px 10px;
-    }
-    header h1 {
-        font-size: 2.2rem;
-    }
-    #video-gallery {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
+.ece-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--surface-beige);
+    border: 2px solid rgba(181, 132, 81, 0.35);
+    box-shadow: 0 0 50px rgba(181, 132, 81, 0.22), 0 15px 40px var(--shadow-tint);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 1;
+    position: relative;
 }
 
-/* Confetti Styles */
+.ece-crown   { font-size: 2rem; margin-bottom: 2px; }
+.ece-name    { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color: var(--text-espresso); line-height: 1; }
+.ece-subtitle { font-size: 0.75rem; color: var(--text-taupe); font-style: italic; margin-top: 5px; }
+.ece-hearts  { margin-top: 8px; color: var(--accent-caramel); font-size: 0.8rem; letter-spacing: 5px; }
+
+/* ════════════════════════════════════════════
+   Sparkle / Confetti
+═══════════════════════════════════════════ */
 .confetti {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     pointer-events: none;
     z-index: 1;
     border-radius: 50%;
 }
-
 @keyframes confettiBurst {
-    0% {
-        transform: translate(0, 0) scale(0);
-        opacity: 0;
-    }
-    20% {
-        opacity: 1;
-        transform: translate(0, 0) scale(1);
-    }
-    100% {
-        transform: translate(var(--dx), var(--dy)) scale(0.5);
-        opacity: 0;
-    }
+    0%   { transform: translate(0,0) scale(0); opacity: 0; }
+    20%  { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0.5); opacity: 0; }
+}
+
+/* ════════════════════════════════════════════
+   Keyframes
+═══════════════════════════════════════════ */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════════════════════════════════════════════
+   Responsive
+═══════════════════════════════════════════ */
+@media (max-width: 960px) {
+    :root { --card-w: 155px; }
+    #family-tree { gap: 65px; padding: 30px 25px 100px; }
+}
+
+@media (max-width: 680px) {
+    :root { --card-w: 130px; }
+    #family-tree { gap: 55px; padding: 20px 15px 80px; }
+    .cluster-inner { gap: 12px; }
+    .sibling-group { gap: 12px; }
+    .video-container { height: 120px; }
+}
+
+@media (max-width: 480px) {
+    #row-gp      { flex-direction: column; gap: 35px; align-items: center; }
+    #row-parents { flex-direction: column; gap: 30px; align-items: center; }
+    #row-siblings { flex-direction: column; gap: 20px; align-items: center; }
+    .parent-left, .parent-right { justify-content: center; }
+    .sibling-group { flex-wrap: wrap; justify-content: center; }
 }
