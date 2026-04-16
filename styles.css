@@ -96,36 +96,15 @@ header p {
 .message-container h2 {
     font-family: 'Playfair Display', serif;
     font-size: 1.8rem;
-    margin-bottom: 20px;
     color: var(--text-espresso);
     border-bottom: 2px solid var(--accent-caramel);
-    display: inline-block;
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    padding-bottom: 5px;
 }
 
-.message-container p {
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: var(--text-taupe);
-}
 
-.message-container ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-.message-container li {
-    margin-bottom: 12px;
-    position: relative;
-    padding-left: 25px;
-    color: var(--text-espresso);
-}
-
-.message-container li::before {
-    content: "♥";
-    position: absolute;
-    left: 0;
-    color: var(--accent-caramel);
-}
 
 /* Animations */
 @keyframes fadeInDown {
