@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     //  Config
     // ═══════════════════════════════════════════════
     const BROWN_SHADES = ['#3A2E28', '#5A4D44', '#B58451', '#D4A373', '#8B5E3C'];
-    const CONNECTOR_GAP = 24;   // px from card edge to start of line
-    const GLOW_HALF    = 260;   // half-height (px) of the illuminated scroll band
+    const CONNECTOR_GAP = 24;  // px from card edge to first connector point
+    const GLOW_HALF    = 260;  // half-height (px) of the illuminated scroll band
 
     // ═══════════════════════════════════════════════
-    //  Sparkle Effect (unchanged behaviour)
+    //  Sparkle Effect
     // ═══════════════════════════════════════════════
     document.querySelectorAll('.video-card').forEach(card => {
         let interval;
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //  Tree Connection Lines
     // ═══════════════════════════════════════════════
 
-    /** Return an element's bounding info in tree-local coordinates. */
+    /** Return card bounding info in tree-local coordinates. */
     function pos(selector) {
         const el = typeof selector === 'string'
             ? document.querySelector(selector)
@@ -65,17 +65,24 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    function cardPos(id)  { return pos(`[data-id="${id}"]`); }
-    function ecePos()     { return pos('.ece-card'); }
+    function cardPos(id) { return pos(`[data-id="${id}"]`); }
+    function ecePos()    { return pos('.ece-card'); }
 
     /**
-     * Build all SVG path `d` strings for the family tree.
+     * Build all SVG path `d` strings for the INVERTED tree.
      *
-     * Relationship map:
-     *  Anneanne + Dede1  ──► Anne, Sule  (maternal grandparents)
-     *  Babanne  + Dede2  ──► Baba        (paternal grandparents)
-     *  Anne  ─marriage─► Baba ──► Ceren, Memo, Kaan, Ece
-     *  Sule              ──► Öykü
+     * Layout (top → bottom):
+     *   Row 1:  ★ Ece ★
+     *   Row 2:  Öykü  |  Ceren  Memo  Kaan
+     *   Row 3:  Sule  Anne  …………………  Baba
+     *   Row 4:  Anneanne Dede  ……  Babanne Dede
+     *
+     * Connections flow DOWNWARD from Ece to grandparents:
+     *   1. Ece → siblings bar → Ceren, Memo, Kaan
+     *   2. Siblings bottom bar → couple bar (Anne–Baba) → Anne, Baba
+     *   3. Öykü → Sule  (L-shape)
+     *   4. Anne + Sule → maternal GP bar → Anneanne, Dede1
+     *   5. Baba → paternal GP bar → Babanne, Dede2
      */
     function buildPaths() {
         const G = CONNECTOR_GAP;
@@ -94,64 +101,82 @@ document.addEventListener('DOMContentLoaded', () => {
         const kaan     = cardPos('kaan');
         const ece      = ecePos();
 
-        // Guard — abort if any card not yet in DOM
-        if ([anneanne, dede1, babanne, dede2, anne, sule, baba, oyku, ceren, memo, kaan, ece].some(p => !p)) return paths;
+        if ([anneanne, dede1, babanne, dede2, anne, sule, baba,
+             oyku, ceren, memo, kaan, ece].some(p => !p)) return paths;
 
-        // ── 1. Maternal grandparents ──► Anne + Sule ──────────────────────
-        const matBarY      = Math.max(anneanne.bottom, dede1.bottom) + G;
-        const matMidX      = (anneanne.x + dede1.x)  / 2;
-        const anneSuleBarY = Math.min(anne.top, sule.top) - G;
-        const leftAS       = Math.min(anne.x,  sule.x);
-        const rightAS      = Math.max(anne.x,  sule.x);
+        // Sibling extents
+        const leftSib  = Math.min(ceren.x, memo.x, kaan.x);
+        const rightSib = Math.max(ceren.x, memo.x, kaan.x);
+        const midSibX  = (leftSib + rightSib) / 2;
 
-        // Couple bracket
-        paths.push(`M ${anneanne.x} ${anneanne.bottom} L ${anneanne.x} ${matBarY} L ${dede1.x} ${matBarY} L ${dede1.x} ${dede1.bottom}`);
-        // Drop then horizontal span
-        paths.push(`M ${matMidX} ${matBarY} L ${matMidX} ${anneSuleBarY} L ${leftAS} ${anneSuleBarY} L ${rightAS} ${anneSuleBarY}`);
-        // Drops to Anne and Sule
-        paths.push(`M ${anne.x} ${anneSuleBarY} L ${anne.x} ${anne.top}`);
-        paths.push(`M ${sule.x} ${anneSuleBarY} L ${sule.x} ${sule.top}`);
+        // ── 1. Ece → Ceren, Memo, Kaan ───────────────────────────────────
+        const eceDropY    = ece.bottom + G;
+        const sibsTopBarY = Math.min(ceren.top, memo.top, kaan.top) - G;
 
-        // ── 2. Paternal grandparents ──► Baba ────────────────────────────
-        const patBarY = Math.max(babanne.bottom, dede2.bottom) + G;
-        const patMidX = (babanne.x + dede2.x) / 2;
-
-        paths.push(`M ${babanne.x} ${babanne.bottom} L ${babanne.x} ${patBarY} L ${dede2.x} ${patBarY} L ${dede2.x} ${dede2.bottom}`);
-        paths.push(`M ${patMidX} ${patBarY} L ${patMidX} ${baba.top - G} L ${baba.x} ${baba.top - G} L ${baba.x} ${baba.top}`);
-
-        // ── 3. Anne + Baba (marriage bar) ──► Ceren, Memo, Kaan ─────────
-        const coupleBarY    = Math.max(anne.bottom, baba.bottom) + G;
-        const coupleMidX    = (anne.x + baba.x) / 2;
-        const siblingsBarY  = Math.min(ceren.top, memo.top, kaan.top) - G;
-        const leftSib       = Math.min(ceren.x, memo.x, kaan.x);
-        const rightSib      = Math.max(ceren.x, memo.x, kaan.x);
-
-        // Marriage bracket
-        paths.push(`M ${anne.x} ${anne.bottom} L ${anne.x} ${coupleBarY} L ${baba.x} ${coupleBarY} L ${baba.x} ${baba.bottom}`);
-        // Drop then horizontal span at siblings level
-        paths.push(`M ${coupleMidX} ${coupleBarY} L ${coupleMidX} ${siblingsBarY} L ${leftSib} ${siblingsBarY} L ${rightSib} ${siblingsBarY}`);
+        // Ece bottom → step across to midSibX → drop to siblings top bar
+        paths.push(`M ${ece.x} ${ece.bottom} L ${ece.x} ${eceDropY} L ${midSibX} ${eceDropY} L ${midSibX} ${sibsTopBarY}`);
+        // Horizontal bar spanning all siblings
+        paths.push(`M ${leftSib} ${sibsTopBarY} L ${rightSib} ${sibsTopBarY}`);
         // Drops to each sibling
-        paths.push(`M ${ceren.x} ${siblingsBarY} L ${ceren.x} ${ceren.top}`);
-        paths.push(`M ${memo.x}  ${siblingsBarY} L ${memo.x}  ${memo.top}`);
-        paths.push(`M ${kaan.x}  ${siblingsBarY} L ${kaan.x}  ${kaan.top}`);
+        paths.push(`M ${ceren.x} ${sibsTopBarY} L ${ceren.x} ${ceren.top}`);
+        paths.push(`M ${memo.x}  ${sibsTopBarY} L ${memo.x}  ${memo.top}`);
+        paths.push(`M ${kaan.x}  ${sibsTopBarY} L ${kaan.x}  ${kaan.top}`);
 
-        // ── 4. Siblings ──► Ece (focal point) ────────────────────────────
+        // ── 2. Siblings → Parents (Anne + Baba marriage bar) ─────────────
         const sibsBottomBarY = Math.max(ceren.bottom, memo.bottom, kaan.bottom) + G;
-        const midSibX        = (leftSib + rightSib) / 2;
+        const coupleMidX     = (anne.x + baba.x) / 2;
+        const coupleBarY     = Math.min(anne.top, baba.top) - G;
 
-        // Bottom bracket across siblings
-        paths.push(`M ${ceren.x} ${ceren.bottom} L ${ceren.x} ${sibsBottomBarY} L ${rightSib} ${sibsBottomBarY}`);
+        // Bottom bracket under siblings
+        paths.push(`M ${leftSib} ${sibsBottomBarY} L ${rightSib} ${sibsBottomBarY}`);
+        paths.push(`M ${ceren.x} ${ceren.bottom} L ${ceren.x} ${sibsBottomBarY}`);
         paths.push(`M ${memo.x}  ${memo.bottom}  L ${memo.x}  ${sibsBottomBarY}`);
         paths.push(`M ${kaan.x}  ${kaan.bottom}  L ${kaan.x}  ${sibsBottomBarY}`);
-        // Drop to Ece
-        paths.push(`M ${midSibX} ${sibsBottomBarY} L ${midSibX} ${ece.top - G} L ${ece.x} ${ece.top - G} L ${ece.x} ${ece.top}`);
 
-        // ── 5. Sule ──► Öykü ─────────────────────────────────────────────
-        const suleOykuBarY = sule.bottom + G * 1.5;
-        paths.push(`M ${sule.x} ${sule.bottom} L ${sule.x} ${suleOykuBarY} L ${oyku.x} ${suleOykuBarY} L ${oyku.x} ${oyku.top}`);
+        // Step from sibling-mid down & across to couple-mid, then to couple bar
+        const stepY = sibsBottomBarY + (coupleBarY - sibsBottomBarY) * 0.5;
+        paths.push(`M ${midSibX} ${sibsBottomBarY} L ${midSibX} ${stepY} L ${coupleMidX} ${stepY} L ${coupleMidX} ${coupleBarY}`);
+
+        // Couple bar + drops to Anne and Baba
+        paths.push(`M ${anne.x} ${coupleBarY} L ${baba.x} ${coupleBarY}`);
+        paths.push(`M ${anne.x} ${coupleBarY} L ${anne.x} ${anne.top}`);
+        paths.push(`M ${baba.x} ${coupleBarY} L ${baba.x} ${baba.top}`);
+
+        // ── 3. Öykü → Sule (L-shape downward) ───────────────────────────
+        const oykuDropBarY = oyku.bottom + G * 1.5;
+        paths.push(`M ${oyku.x} ${oyku.bottom} L ${oyku.x} ${oykuDropBarY} L ${sule.x} ${oykuDropBarY} L ${sule.x} ${sule.top}`);
+
+        // ── 4. Anne + Sule → Anneanne + Dede1 (maternal GPs) ─────────────
+        const leftAS           = Math.min(anne.x, sule.x);
+        const rightAS          = Math.max(anne.x, sule.x);
+        const midASX           = (leftAS + rightAS) / 2;
+        const anneSuleDropBarY = Math.max(anne.bottom, sule.bottom) + G;
+        const matGpBarY        = Math.min(anneanne.top, dede1.top) - G;
+        const leftMat          = Math.min(anneanne.x, dede1.x);
+        const rightMat         = Math.max(anneanne.x, dede1.x);
+
+        // Bracket under Anne + Sule
+        paths.push(`M ${anne.x} ${anne.bottom} L ${anne.x} ${anneSuleDropBarY}`);
+        paths.push(`M ${sule.x} ${sule.bottom} L ${sule.x} ${anneSuleDropBarY}`);
+        paths.push(`M ${leftAS} ${anneSuleDropBarY} L ${rightAS} ${anneSuleDropBarY}`);
+        // Drop to maternal GP bar + horizontal span + drops to GPs
+        paths.push(`M ${midASX} ${anneSuleDropBarY} L ${midASX} ${matGpBarY} L ${leftMat} ${matGpBarY} L ${rightMat} ${matGpBarY}`);
+        paths.push(`M ${anneanne.x} ${matGpBarY} L ${anneanne.x} ${anneanne.top}`);
+        paths.push(`M ${dede1.x}    ${matGpBarY} L ${dede1.x}    ${dede1.top}`);
+
+        // ── 5. Baba → Babanne + Dede2 (paternal GPs) ─────────────────────
+        const patGpBarY = Math.min(babanne.top, dede2.top) - G;
+        const leftPat   = Math.min(babanne.x, dede2.x);
+        const rightPat  = Math.max(babanne.x, dede2.x);
+
+        paths.push(`M ${baba.x} ${baba.bottom} L ${baba.x} ${patGpBarY} L ${leftPat} ${patGpBarY} L ${rightPat} ${patGpBarY}`);
+        paths.push(`M ${babanne.x} ${patGpBarY} L ${babanne.x} ${babanne.top}`);
+        paths.push(`M ${dede2.x}   ${patGpBarY} L ${dede2.x}   ${dede2.top}`);
 
         return paths;
     }
+
+    // ─── SVG helpers ────────────────────────────────────────────────────
 
     function addPath(d, layer, cls) {
         const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -167,15 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drawConnections() {
         clearLayers();
-        const tree     = document.getElementById('family-tree');
-        const svg      = document.getElementById('tree-svg');
-        const dimLayer = document.getElementById('dim-layer');
-        const glowLayer= document.getElementById('glow-layer');
+        const tree      = document.getElementById('family-tree');
+        const svg       = document.getElementById('tree-svg');
+        const dimLayer  = document.getElementById('dim-layer');
+        const glowLayer = document.getElementById('glow-layer');
 
         svg.setAttribute('height', tree.scrollHeight);
 
         buildPaths().forEach(d => {
-            addPath(d, dimLayer, 'dim-path');
+            addPath(d, dimLayer,  'dim-path');
             addPath(d, glowLayer, 'glow-path');
         });
     }
@@ -188,12 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const tree     = document.getElementById('family-tree');
         if (!gradient || !tree) return;
 
-        // Viewport centre expressed in tree-local Y coordinates
-        const treeRect    = tree.getBoundingClientRect();
-        const viewCenterY = window.innerHeight / 2;
-        const localCenterY = viewCenterY - treeRect.top;
+        // Viewport centre in tree-local Y coordinates
+        const treeRect     = tree.getBoundingClientRect();
+        const localCenterY = window.innerHeight / 2 - treeRect.top;
 
-        // Move gradient to illuminate a band around the viewport centre
         gradient.setAttribute('y1', localCenterY - GLOW_HALF);
         gradient.setAttribute('y2', localCenterY + GLOW_HALF);
     }
@@ -201,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ═══════════════════════════════════════════════
     //  Initialise
     // ═══════════════════════════════════════════════
-    // Small delay lets the browser finish layout before measuring positions.
     requestAnimationFrame(() => {
         setTimeout(() => {
             drawConnections();
@@ -211,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', updateGlow, { passive: true });
 
-    // Redraw on resize (debounced)
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
