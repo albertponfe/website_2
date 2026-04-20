@@ -297,4 +297,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 300);
     });
 
+    // ═══════════════════════════════════════════════
+    //  Video Lightbox Handling
+    // ═══════════════════════════════════════════════
+    const lightbox = document.getElementById('video-lightbox');
+    const lightboxIframe = document.getElementById('lightbox-iframe');
+    const lightboxTitle = document.getElementById('lightbox-title');
+    const lightboxClose = document.getElementById('lightbox-close');
+    
+    if (lightbox) {
+        document.querySelectorAll('.video-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const iframe = card.querySelector('iframe');
+                if (!iframe) return; 
+                
+                const titleEl = card.querySelector('h2');
+                lightboxTitle.textContent = titleEl ? titleEl.textContent : '';
+                
+                lightboxIframe.src = iframe.src;
+                
+                lightbox.classList.remove('hidden');
+                setTimeout(() => lightbox.classList.add('active'), 10);
+            });
+        });
+
+        const closeLightbox = () => {
+            lightbox.classList.remove('active');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+                lightboxIframe.src = ''; // stop audio/video
+            }, 400); 
+        };
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightbox.querySelector('.lightbox-backdrop').addEventListener('click', closeLightbox);
+    }
+
 });
