@@ -26,7 +26,6 @@ body {
     background-color: var(--bg-cream);
     color: var(--text-espresso);
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
 }
 
 /* ════════════════════════════════════════════
@@ -54,7 +53,8 @@ header p {
 ═══════════════════════════════════════════ */
 #family-tree {
     position: relative;
-    max-width: 1400px;
+    width: max-content;
+    min-width: 100%;
     margin: 0 auto;
     padding: 40px 40px 120px;
     display: flex;
@@ -102,9 +102,7 @@ header p {
 
 /* Row 1 — Grandparents */
 #row-gp {
-    justify-content: center;
-    gap: 60px;
-    flex-wrap: wrap;
+    justify-content: space-between;
 }
 .gp-cluster {
     display: flex;
@@ -114,9 +112,7 @@ header p {
 }
 .cluster-inner {
     display: flex;
-    gap: 40px;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 30px;
 }
 .cluster-label {
     font-family: 'Playfair Display', serif;
@@ -130,16 +126,12 @@ header p {
 
 /* Row 2 — Parents + Aunt */
 #row-parents {
-    justify-content: center;
-    gap: 60px;
-    flex-wrap: wrap;
+    justify-content: space-between;
 }
 .parent-left {
     display: flex;
-    gap: 40px;
+    gap: 30px;
     align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 .parent-right {
     display: flex;
@@ -148,18 +140,14 @@ header p {
 
 /* Row 3 — Siblings + Cousin */
 #row-siblings {
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 60px;
-    flex-wrap: wrap;
 }
 .cousin-group { flex: 0 0 auto; }
 .sibling-group {
     display: flex;
-    gap: 40px;
+    gap: 30px;
     align-items: center;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 
 /* Row 4 — Birthday Girl */
