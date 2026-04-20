@@ -8,6 +8,56 @@ document.addEventListener('DOMContentLoaded', () => {
     const GLOW_HALF    = 260;  // half-height (px) of the illuminated scroll band
 
     // ═══════════════════════════════════════════════
+    //  Intro Reveal Sequence
+    // ═══════════════════════════════════════════════
+    const sequence = [
+        document.querySelector('header'),
+        document.querySelector('.ece-card'),
+        ...document.querySelectorAll('#row-siblings .video-card'),
+        ...document.querySelectorAll('#row-parents .video-card'),
+        ...document.querySelectorAll('#row-gp .video-card')
+    ];
+
+    sequence.forEach(el => {
+        if (el) el.classList.add('start-hidden');
+    });
+
+    const treeSvg = document.getElementById('tree-svg');
+    if (treeSvg) {
+        treeSvg.style.opacity = '0';
+        // Need to add pointer-events:none or something? No, it already has pointer-events: none;
+    }
+
+    // Start sequence
+    setTimeout(() => {
+        const whiteout = document.getElementById('whiteout-overlay');
+        if (whiteout) whiteout.style.opacity = '0';
+        
+        let delay = 1500; 
+        
+        sequence.forEach((el) => {
+            if (el) {
+                setTimeout(() => {
+                    el.style.animation = 'fadeInItem 1.5s ease-out forwards';
+                    el.addEventListener('animationend', () => {
+                        el.classList.remove('start-hidden');
+                        el.style.animation = ''; // clean up so hover transforms work
+                    }, { once: true });
+                }, delay);
+                delay += 400; // 400ms stagger between elements
+            }
+        });
+
+        if (treeSvg) {
+            setTimeout(() => {
+                treeSvg.style.transition = 'opacity 2s ease-in-out';
+                treeSvg.style.opacity = '1';
+            }, delay + 500); 
+        }
+    }, 500);
+
+    // ═══════════════════════════════════════════════
+
     //  Sparkle Effect
     // ═══════════════════════════════════════════════
     document.querySelectorAll('.video-card').forEach(card => {
@@ -101,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const kaan     = cardPos('kaan');
         const ece      = ecePos();
 
-        if ([anneanne, dede1, babanne, dede2, anne, sule, baba,
+        if ([anneanne, dede1, babanne, anne, sule, baba,
              oyku, ceren, memo, kaan, ece].some(p => !p)) return paths;
 
         // Sibling extents
@@ -164,14 +214,19 @@ document.addEventListener('DOMContentLoaded', () => {
         paths.push(`M ${anneanne.x} ${matGpBarY} L ${anneanne.x} ${anneanne.top}`);
         paths.push(`M ${dede1.x}    ${matGpBarY} L ${dede1.x}    ${dede1.top}`);
 
-        // ── 5. Baba → Babanne + Dede2 (paternal GPs) ─────────────────────
-        const patGpBarY = Math.min(babanne.top, dede2.top) - G;
-        const leftPat   = Math.min(babanne.x, dede2.x);
-        const rightPat  = Math.max(babanne.x, dede2.x);
+        // ── 5. Baba → Babanne (+ Dede2 if exists) ─────────────────────
+        if (dede2) {
+            const patGpBarY = Math.min(babanne.top, dede2.top) - G;
+            const leftPat   = Math.min(babanne.x, dede2.x);
+            const rightPat  = Math.max(babanne.x, dede2.x);
 
-        paths.push(`M ${baba.x} ${baba.bottom} L ${baba.x} ${patGpBarY} L ${leftPat} ${patGpBarY} L ${rightPat} ${patGpBarY}`);
-        paths.push(`M ${babanne.x} ${patGpBarY} L ${babanne.x} ${babanne.top}`);
-        paths.push(`M ${dede2.x}   ${patGpBarY} L ${dede2.x}   ${dede2.top}`);
+            paths.push(`M ${baba.x} ${baba.bottom} L ${baba.x} ${patGpBarY} L ${leftPat} ${patGpBarY} L ${rightPat} ${patGpBarY}`);
+            paths.push(`M ${babanne.x} ${patGpBarY} L ${babanne.x} ${babanne.top}`);
+            paths.push(`M ${dede2.x}   ${patGpBarY} L ${dede2.x}   ${dede2.top}`);
+        } else {
+            const patGpBarY = babanne.top - G;
+            paths.push(`M ${baba.x} ${baba.bottom} L ${baba.x} ${patGpBarY} L ${babanne.x} ${patGpBarY} L ${babanne.x} ${babanne.top}`);
+        }
 
         return paths;
     }
