@@ -12,7 +12,7 @@
     --transition-smooth: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     --line-dim:          rgba(181, 132, 81, 0.18);
     --line-glow:         #D4A373;
-    --card-w:            185px;
+    --card-w:            460px;
 }
 
 /* ════════════════════════════════════════════
@@ -54,12 +54,12 @@ header p {
 ═══════════════════════════════════════════ */
 #family-tree {
     position: relative;
-    max-width: 1300px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 40px 40px 120px;
     display: flex;
     flex-direction: column;
-    gap: 80px; /* vertical spacing between rows — also the space for SVG connectors */
+    gap: 120px; /* vertical spacing between rows — also the space for SVG connectors */
 }
 
 /* ════════════════════════════════════════════
@@ -102,7 +102,9 @@ header p {
 
 /* Row 1 — Grandparents */
 #row-gp {
-    justify-content: space-between;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
 }
 .gp-cluster {
     display: flex;
@@ -112,7 +114,9 @@ header p {
 }
 .cluster-inner {
     display: flex;
-    gap: 20px;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 .cluster-label {
     font-family: 'Playfair Display', serif;
@@ -126,12 +130,16 @@ header p {
 
 /* Row 2 — Parents + Aunt */
 #row-parents {
-    justify-content: space-between;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
 }
 .parent-left {
     display: flex;
-    gap: 20px;
+    gap: 40px;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 .parent-right {
     display: flex;
@@ -140,14 +148,18 @@ header p {
 
 /* Row 3 — Siblings + Cousin */
 #row-siblings {
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    gap: 60px;
+    flex-wrap: wrap;
 }
 .cousin-group { flex: 0 0 auto; }
 .sibling-group {
     display: flex;
-    gap: 20px;
+    gap: 40px;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 /* Row 4 — Birthday Girl */
@@ -180,7 +192,9 @@ header p {
 
 .video-container {
     background: linear-gradient(135deg, #E6DED5, #D9CFC4);
-    height: 150px;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -232,8 +246,8 @@ header p {
 ═══════════════════════════════════════════ */
 .ece-card {
     position: relative;
-    width: 240px;
-    height: 240px;
+    width: 320px;
+    height: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
